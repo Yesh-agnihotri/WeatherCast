@@ -16,7 +16,7 @@ import java.util.Locale;
 
 public class GetWeather
 {
-    static final String weather_url ="http://api.openweathermap.org/data/2.5/weather?lat=%s&lon=%s&units=metric";
+    static final String weather_url ="http://api.openweathermap.org/data/2.5/weather?q=%s&units=metric";
     static final String api_id = "025134d1ae0ad7f1d8fda20c8c965a46";
 
     public interface Response //to pass the values from asynctask to processfinish
@@ -34,7 +34,7 @@ public class GetWeather
 
             JSONObject jsonWeather = null;
             try {
-                jsonWeather = access_api(params[0], params[1]);
+                jsonWeather = access_api(params[0]);
             } catch (Exception e) {
                 Log.d("Error", "Cannot process JSON results", e);
             }
@@ -64,10 +64,10 @@ public class GetWeather
             }
         }
     }
-    public static JSONObject access_api(String lat, String lon){
+    public static JSONObject access_api(String city){
         try
         {
-            URL url = new URL(String.format(weather_url, lat, lon));
+            URL url = new URL(String.format(weather_url, city));
             HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 
             conn.addRequestProperty("x-api-key", api_id);//add my api key to url

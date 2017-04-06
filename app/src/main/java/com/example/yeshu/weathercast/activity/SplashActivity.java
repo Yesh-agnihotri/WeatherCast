@@ -7,15 +7,16 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.yeshu.weathercast.activity.MainActivity;
+
+import com.example.yeshu.weathercast.utils.NetworkUtils;
 import com.example.yeshu.weathercast1.R;
-import com.example.yeshu.weathercast1.utils.NetworkUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -36,10 +37,12 @@ public class SplashActivity extends AppCompatActivity implements Animation.Anima
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash);
         ButterKnife.bind(this);
-        if (NetworkUtils.isGooglePlayServicesAvailable()) {
-            if (NetworkUtils.isNetConnected()) {
+        sun.setVisibility(View.GONE);
+        weatherCast.setVisibility(View.GONE);
+        if (NetworkUtils.isGooglePlayServicesAvailable(this)) {
+            if (NetworkUtils.isNetConnected(getApplicationContext())) {
 
-                Animation animation = AnimationUtils.loadAnimation(this, R.anim.boatanim);
+                Animation animation = AnimationUtils.loadAnimation(this, R.anim.cloudanim);
                 animation.setFillAfter(true);
                 animation.setAnimationListener(this);
                 cloud.startAnimation(animation);
@@ -92,6 +95,8 @@ public class SplashActivity extends AppCompatActivity implements Animation.Anima
 
     @Override
     public void onAnimationEnd(Animation animation) {
+        sun.setVisibility(View.VISIBLE);
+        weatherCast.setVisibility(View.VISIBLE);
         AlphaAnimation fadeOut = new AlphaAnimation(0.0f , 1.0f ) ;
         AlphaAnimation fadeIn = new AlphaAnimation( 1.0f , 0.0f ) ;
         sun.startAnimation(fadeIn);

@@ -1,4 +1,4 @@
-package com.example.yeshu.weathercast1.utils;
+package com.example.yeshu.weathercast.utils;
 
 /**
  * Created by shobhit on 28/2/17.

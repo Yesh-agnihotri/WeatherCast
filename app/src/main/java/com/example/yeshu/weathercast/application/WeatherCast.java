@@ -1,10 +1,10 @@
-package com.example.yeshu.weathercast1.application;
+package com.example.yeshu.weathercast.application;
 
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.example.yeshu.weathercast1.utils.Constants;
+import com.example.yeshu.weathercast.utils.Constants;
 
 /**
  * Created by simran on 4/6/2017.

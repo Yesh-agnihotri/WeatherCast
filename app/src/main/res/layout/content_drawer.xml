@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.example.yeshu.weathercast1.MainActivity"
+    tools:context="com.example.yeshu.weathercast1.com.example.yeshu.weathercast.activity.MainActivity"
     tools:showIn="@layout/activity_main">
 
     <RelativeLayout

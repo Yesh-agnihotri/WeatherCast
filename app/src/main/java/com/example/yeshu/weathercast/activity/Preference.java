@@ -1,4 +1,4 @@
-package com.example.yeshu.weathercast1;
+package com.example.yeshu.weathercast.activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -11,14 +11,13 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.SupportMapFragment;
+import com.example.yeshu.weathercast1.R;
 
 import java.io.InputStream;
 import java.net.URL;

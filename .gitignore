@@ -1,8 +1,33 @@
-*.iml
+build
 .gradle
-/local.properties
-/.idea/workspace.xml
-/.idea/libraries
+.idea
+local.properties
+*.iml
 .DS_Store
-/build
-/captures
+*.sublime-project
+
+# emacs backup files
+*.*~
+
+# gradle env props
+gradle.properties
+
+# built application files
+*.apk
+*.ap_
+
+# files for the Dalvik VM
+*.dex
+
+# Java class files
+*.class
+
+# Generated files
+bin/
+gen/
+out/
+
+# Android Studio files
+.externalNativeBuild/
+.navigation/
+captures/

@@ -1,4 +1,4 @@
-package com.example.yeshu.weathercast1.activity;
+package com.example.yeshu.weathercast.activity;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -13,7 +13,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.yeshu.weathercast1.MainActivity;
+import com.example.yeshu.weathercast.activity.MainActivity;
 import com.example.yeshu.weathercast1.R;
 import com.example.yeshu.weathercast1.utils.NetworkUtils;
 

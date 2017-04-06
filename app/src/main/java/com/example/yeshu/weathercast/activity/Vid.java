@@ -1,4 +1,4 @@
-package com.example.yeshu.weathercast1;
+package com.example.yeshu.weathercast.activity;
 
 /**
  * Created by yeshu on 20-09-2016.
@@ -8,6 +8,8 @@ import android.app.Activity;
         import android.os.Bundle;
         import android.widget.MediaController;
         import android.widget.VideoView;
+
+import com.example.yeshu.weathercast1.R;
 
 /**
  * Created by Lenovo on 20-Sep-16.

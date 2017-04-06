@@ -1,4 +1,4 @@
-package com.example.yeshu.weathercast1;
+package com.example.yeshu.weathercast.activity;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -12,6 +12,8 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
+
+import com.example.yeshu.weathercast1.R;
 
 /**
  * Created by Lenovo on 18-Sep-16.

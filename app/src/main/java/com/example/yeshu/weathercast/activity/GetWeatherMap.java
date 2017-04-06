@@ -1,4 +1,4 @@
-package com.example.yeshu.weathercast1;
+package com.example.yeshu.weathercast.activity;
 
 import android.os.AsyncTask;
 import android.util.Log;

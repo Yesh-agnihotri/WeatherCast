@@ -1,4 +1,4 @@
-package com.example.yeshu.weathercast1;
+package com.example.yeshu.weathercast.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.content.DialogInterface;
@@ -9,10 +9,11 @@ import android.hardware.Camera.Parameters;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+
+import com.example.yeshu.weathercast1.R;
 
 import java.util.Random;
 /**

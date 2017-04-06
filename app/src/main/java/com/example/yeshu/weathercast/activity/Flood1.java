@@ -1,4 +1,4 @@
-package com.example.yeshu.weathercast1;
+package com.example.yeshu.weathercast.activity;
 
 /**
  * Created by yeshu on 20-09-2016.
@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+
+import com.example.yeshu.weathercast1.R;
 
 public class Flood1 extends AppCompatActivity {
     protected void onCreate( Bundle savedInstanceState) {

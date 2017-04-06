@@ -1,9 +1,11 @@
-package com.example.yeshu.weathercast1;
+package com.example.yeshu.weathercast.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+
+import com.example.yeshu.weathercast1.R;
 
 /**
  * Created by Lenovo on 17-Sep-16.

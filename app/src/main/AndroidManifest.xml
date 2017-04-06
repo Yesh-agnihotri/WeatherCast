@@ -23,7 +23,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name="com.example.yeshu.weathercast.activity.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -45,43 +45,43 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".MapsActivity"
+            android:name="com.example.yeshu.weathercast.activity.MapsActivity"
             android:label="@string/title_activity_maps" />
 
         <activity
-            android:name=".Preference"
+            android:name="com.example.yeshu.weathercast.activity.Preference"
             android:label="Last Searched City" />
-        <activity android:name=".Notify"
+        <activity android:name="com.example.yeshu.weathercast.activity.Notify"
             android:label="Notification"/>
 
-        <activity android:name=".Cloud">
+        <activity android:name="com.example.yeshu.weathercast.activity.Cloud">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
 
             </intent-filter>
         </activity>
-        <activity android:name=".Flood1">
+        <activity android:name="com.example.yeshu.weathercast.activity.Flood1">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
 
             </intent-filter>
         </activity>
-        <activity android:name=".Video">
+        <activity android:name="com.example.yeshu.weathercast.activity.Video">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
 
             </intent-filter>
         </activity>
-        <activity android:name=".Vid">
+        <activity android:name="com.example.yeshu.weathercast.activity.Vid">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
 
-        <activity android:name=".Disaster">
+        <activity android:name="com.example.yeshu.weathercast.activity.Disaster">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>

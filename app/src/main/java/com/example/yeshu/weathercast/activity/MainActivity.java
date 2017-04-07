@@ -38,6 +38,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.yeshu.weathercast.utils.GPSTracker;
 import com.example.yeshu.weathercast1.R;
 
 import org.json.JSONArray;
@@ -55,7 +56,58 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements LocationListener, GetWeatherMap.ResponseMap, AdapterView.OnItemClickListener, GetWeather.Response, forecast.ResponseForecast {
+import android.annotation.TargetApi;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Bundle;
+import android.provider.Settings;
+import android.support.v4.app.NotificationCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Filter;
+import android.widget.Filterable;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+public class MainActivity extends AppCompatActivity implements GetWeatherMap.ResponseMap, AdapterView.OnItemClickListener, GetWeather.Response, forecast.ResponseForecast {
 
     forecast.weatherTask obj2;
     ProgressBar progressBar, progressBarForecast;
@@ -73,6 +125,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     private LocationManager locationManager;
     private String provider;
     SharedPreferences sharedpreferences;
+    ConnectivityManager connectivityManager;
+    GetWeatherMap.MapWeatherTask obj1;
+    GPSTracker gps;
+    FloatingActionButton menu1,menu2,menu3,menu4,menu5 ;
 
 
     @Override
@@ -81,27 +137,45 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        // Define the criteria how to select the locatioin provider -> use
-        // default
 
-        Criteria criteria = new Criteria();
-        provider = locationManager.getBestProvider(criteria, false);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-            Toast.makeText(this,"Location not available. Enter it manually",Toast.LENGTH_LONG).show();
+        Location location;
+        boolean l;
+        gps = new GPSTracker(this);
+        l=gps.canGetLocation();
+        if(l==true) {
+            location = gps.getLocation();
+            // Initialize the location fields
+            if (location != null) {
+                double latitude = gps.getLatitude();
+                double longitude = gps.getLongitude();
+
+                String lai = String.format("%f", latitude);
+                String lni = String.format("%f", longitude);
+                Toast.makeText(this, lai, Toast.LENGTH_LONG).show();
+                obj1 = new GetWeatherMap.MapWeatherTask();
+                obj1.delegateMap = this;
+                Toast.makeText(this, lai, Toast.LENGTH_LONG).show();
+                obj1.execute(lai, lni);
+                city();
+                result1 = result;
+
+
+            } else {
+
+
+                Toast.makeText(this,"Location not available",Toast.LENGTH_LONG).show();
+
+
+            }
         }
-        Location location = locationManager.getLastKnownLocation(provider);
+        else
+        {gps.showSettingsAlert();
 
-        // Initialize the location fields
-        if (location != null)
-        {
-            System.out.println("Provider " + provider + " has been selected.");
-            onLocationChanged(location);
         }
 
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
                 connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED)
         {
@@ -116,19 +190,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         sharedpreferences = getSharedPreferences(mypreference,
                 Context.MODE_PRIVATE);
 
-        GetWeatherMap.MapWeatherTask obj1;
-        obj1=new GetWeatherMap.MapWeatherTask();
-        obj1.delegateMap=this;
-        Toast.makeText(this,la,Toast.LENGTH_LONG).show();
-        obj1.execute(la,ln);
+
+
 
         obj2=new forecast.weatherTask();
         obj2.delegateforcast=this;
         obj2.execute(result1);
         Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
 
-       progressBar=(ProgressBar)findViewById(R.id.progressBar);
-       progressBar.setVisibility(View.VISIBLE);
+        progressBar=(ProgressBar)findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
         progressBarForecast=(ProgressBar)findViewById(R.id.progressBarForeCast);
         progressBarForecast.setVisibility(View.VISIBLE);
         AutoCompleteTextView autoCompView = (AutoCompleteTextView) findViewById(R.id.autoCompleteTextView);
@@ -149,48 +220,68 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         temprange=(TextView)findViewById(R.id.TempRange);
 
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view)
-            {
-               Intent intent=new Intent(getApplicationContext(),MapsActivity.class);
-                startActivity(intent);
-            }
-        });
 
-        FloatingActionButton prefence = (FloatingActionButton) findViewById(R.id.preference);
-        prefence.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view)
-            {
-                Intent intent=new Intent(getApplicationContext(),Preference.class);
-                startActivity(intent);
-            }
-        });
-        FloatingActionButton fabshare = (FloatingActionButton) findViewById(R.id.fabshare);
-        fabshare.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view)
-            {
-                Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-                sharingIntent.setType("text/plain");
-                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Weather App");
-                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, "Now Share this exclusive weather app http//googleplaystroe.com");
-                startActivity(Intent.createChooser(sharingIntent, "Share via"));
-            }
-        });
-        FloatingActionButton fabdisaster = (FloatingActionButton) findViewById(R.id.fabdisaster);
-        fabdisaster.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view)
-            {
-                Intent intent=new Intent(getApplicationContext(),Disaster.class);
-                startActivity(intent);
 
-            }
-        });
 
+    }
+    public void change(View v) {
+        Intent intent=new Intent(getApplicationContext(),MapsActivity.class);
+        startActivity(intent);
+
+        Toast.makeText(MainActivity.this , "Map view", Toast.LENGTH_LONG).show();
+
+    }
+    public void chang(View v) {
+        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+        sharingIntent.setType("text/plain");
+        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Weather App");
+        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, "Now Share this exclusive weather app http//googleplaystroe.com");
+        startActivity(Intent.createChooser(sharingIntent, "Share via"));
+
+        Toast.makeText(MainActivity.this , "Share App", Toast.LENGTH_LONG).show();
+
+
+    }
+
+    public void cha(View v) {
+        Intent i =new Intent(getApplicationContext(),Disaster.class);
+        startActivity(i);
+
+        Toast.makeText(MainActivity.this , "Disaster", Toast.LENGTH_LONG).show();
+
+
+
+
+    }
+    public void ch(View v) {
+        Intent i =new Intent(this,Preference.class);
+        startActivity(i);
+
+        Toast.makeText(MainActivity.this , "Last search", Toast.LENGTH_LONG).show();
+
+
+
+
+    }
+
+    @Override
+    public void onRestart() {
+        super.onRestart();
+        //When BACK BUTTON is pressed, the activity on the stack is restarted
+        //Do what you want on the refresh procedure here
+        gps = new GPSTracker(this);
+        double latitude = gps.getLatitude();
+        double longitude = gps.getLongitude();
+
+        String  lai=String.format("%f",latitude);
+        String  lni=String.format("%f",longitude);
+        Toast.makeText(this,lai,Toast.LENGTH_LONG).show();
+        obj1=new GetWeatherMap.MapWeatherTask();
+        obj1.delegateMap=this;
+        Toast.makeText(this,lai,Toast.LENGTH_LONG).show();
+        obj1.execute(lai,lni);
+        city();
+        result1=result;
 
     }
 
@@ -201,6 +292,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         getMenuInflater().inflate(R.menu.drawer, menu);
         return true;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -235,7 +327,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 str1=str1+str.charAt(i);
             }
         }
-         flag=0;
+        flag=0;
         GetWeather.weatherTask obj = new GetWeather.weatherTask();
         obj.delegate=this;
         obj.execute(str1);
@@ -249,8 +341,21 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
     }
-    public static ArrayList<String> autocomplete(String input)
+
+
+
+    public  ArrayList<String> autocomplete(String input)
     {
+        connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED)
+        {
+        }
+        else
+        {
+            alertDialog("Error", "Sorry, your device doesn't connect to internet!");
+        }
+        progressBar.setVisibility(View.VISIBLE);
         ArrayList<String> resultList = null;
 
         HttpURLConnection conn = null;
@@ -306,33 +411,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         return resultList;
     }
 
-    String la,ln;
-    @Override
-    public void onLocationChanged(Location location)
-    {
-        lat = location.getLatitude();
-        lng = location.getLongitude();
-        la=String.format("%f",lat);
-        ln=String.format("%f",lng);
-        city();
-        result1=result;
-    }
 
 
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
 
-    }
 
-    @Override
-    public void onProviderEnabled(String provider) {
 
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
 
 
     public String result;
@@ -349,12 +432,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         catch (IOException e)
         {
         }
-            Toast.makeText(this,result,Toast.LENGTH_LONG).show();
-        }
-
+        Toast.makeText(this,result,Toast.LENGTH_LONG).show();
+    }
 
 
     class GooglePlacesAutocompleteAdapter extends ArrayAdapter<String> implements Filterable {
+
         private ArrayList<String> resultList;
 
         public GooglePlacesAutocompleteAdapter(Context context, int textViewResourceId) {
@@ -404,7 +487,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     }
 
     public void processFinish(double lat,double lon,String weather_city, String weather_condition, String weather_temperature, String weather_humidity, String weather_pressure,String lastUpdate,String weather_iconText,String speed,String tempmax,String tempmin,String sun_rise,String sun_set)
-    {
+    {     progressBar.setVisibility(View.GONE);
 
         wind.setText(speed);
         temprange.setText(tempmin+"/"+tempmin);
@@ -443,7 +526,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     int flag=0;
     ImageView imageView1,imageView2,imageView3;
     public void processFinishforecast(String condition,String temperature,String time,String weather_iconText)
-    {
+    { connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED)
+        {
+        }
+        else
+        {
+            alertDialog("Error", "Sorry, your device doesn't connect to internet!");
+        }
         progressBarForecast.setVisibility(View.GONE);
 
         TextView forecastcond,forecasttemp,forecasttime;
@@ -549,14 +640,17 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
             }.execute();
         }
         flag++;
-        }
+    }
     PendingIntent pIntent;
     Intent intent;
-    public void processFinish(double lat,String weather_city, String weather_condition, String weather_temperature, String weather_humidity, String weather_pressure,String lastUpdate,String weather_iconText,String speed,String tempmax,String tempmin,String sun_rise,String sun_set)
+    String weath;
+    String cond;
+    @TargetApi(Build.VERSION_CODES.M)
+    public void processFinish(double lat, String weather_city, String weather_condition, String weather_temperature, String weather_humidity, String weather_pressure, String lastUpdate, String weather_iconText, String speed, String tempmax, String tempmin, String sun_rise, String sun_set)
     {
         progressBar.setVisibility(View.GONE);
-        String weath=weather_city;
-        String cond=weather_condition;
+        this.weath=weather_city;
+        this.cond=weather_condition;
         wind.setText(speed);
         temprange.setText(tempmin+"/"+tempmax);
         press.setText(weather_pressure);
@@ -596,16 +690,59 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         }.execute();
 
-        Notification noti = new Notification.Builder(this)
-                .setContentTitle(weath+cond)
-                .setContentText(weather_condition).setSmallIcon(R.drawable.not_icon).build();
+
+        showNotification();
+
+
+    }
+    private static final int notificationId=1;
+    public void showNotification() { // Use NotificationCompat.Builder to set up our notification.
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+
+        //icon appears in device notification bar and right hand corner of notification
+        builder.setSmallIcon(R.drawable.icon);
+
+        // This intent is fired when notification is clicked
+        Intent intent = new Intent(this,MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+        // Set the intent that will fire when the user taps the notification.
+        builder.setContentIntent(pendingIntent);
+
+        // Large icon appears on the left of the notification
+        builder.setLargeIcon(BitmapFactory.decodeResource(getResources(),R.drawable.icon));
+
+        // Content title, which appears in large type at the top of the notification
+        builder.setContentTitle(this.weath);
+
+        // Content text, which appears in smaller text below the title
+        builder.setContentText(this.weath+this.cond);
+
+        // The subtext, which appears under the text on newer devices.
+        // This will show-up in the devices with Android 4.2 and above only
+
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        // hide the notification after its selected
-        noti.flags |= Notification.FLAG_AUTO_CANCEL;
 
-        notificationManager.notify(0, noti);
+        // Will display the notification in the notification bar
+        notificationManager.notify( notificationId, builder.build());
+
     }
+
+
+
+    public void chan(View v) {
+        Intent i =new Intent(getApplicationContext(),Notify.class);
+
+
+
+        startActivity(i);
+
+        Toast.makeText(MainActivity.this , "Setting", Toast.LENGTH_LONG).show();
+
+
+    }
+
 
     //method for alert Dialog
     public void alertDialog(String title , String message){
@@ -613,16 +750,25 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         android.app.AlertDialog.Builder alertDialog = new android.app.AlertDialog.Builder(MainActivity.this);
         alertDialog.setTitle(title);
         alertDialog.setMessage(message);
-        alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                finish();
-            }
-        });
+        alertDialog.setPositiveButton("Settings",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(
+                                Settings.ACTION_WIFI_SETTINGS);
+                        startActivity(intent);
+                    }
+                });
+        alertDialog.setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
         alertDialog.create();
         alertDialog.setCancelable(false);
         alertDialog.show();
 
     }
 
-    }
+
+}
